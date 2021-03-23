@@ -1,6 +1,6 @@
 {{- $dot := . -}}
 {{- $ctx := .context -}}
-{{- $basename := .basename -}}
+{{- $basename := (lower .basename) -}}
 {{- $variant := .variant | default "large" -}}
 {{- $extension := .extension | default ".svg" -}}
 {{- $img_url := $ctx.Site.Params.integrations_img_url -}}
@@ -54,7 +54,7 @@
     {{- $fname := print ($basename | lower) ".png" }}
     {{- $src := (print "images/integrations_logos/" $fname) -}}
     {{- if (fileExists (print "static/" $src)) -}}
-      {{- warnf "missing integration svg %q falling back to %q" $basename $fname -}}
+      <!--{{/* {{- warnf "missing integration svg %q falling back to %q" $basename $fname -}} */}}-->
       {{- $output_image = (print site.Params.img_url $src) -}}
     {{- else -}}
       {{- if eq $ctx.Page.Language.Lang "en" -}}
