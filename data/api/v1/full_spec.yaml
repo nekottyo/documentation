@@ -2399,12 +2399,9 @@ components:
       - GROUP
     HTTPLog:
       description: Structured log message.
-      oneOf:
-      - $ref: '#/components/schemas/HTTPLogItem'
-      - description: List of log items.
-        items:
-          $ref: '#/components/schemas/HTTPLogItem'
-        type: array
+      items:
+        $ref: '#/components/schemas/HTTPLogItem'
+      type: array
     HTTPLogError:
       description: Invalid query performed.
       properties:
@@ -4480,9 +4477,16 @@ components:
       properties:
         series:
           description: A list of time series to submit to Datadog.
+          example:
+          - metric: system.load.1
+            points:
+            - - 1475317847
+              - 0.7
           items:
             $ref: '#/components/schemas/Series'
           type: array
+      required:
+      - series
       type: object
     MetricsQueryMetadata:
       description: Object containing all metric names returned and their associated
@@ -10175,6 +10179,11 @@ components:
             (and were NOT running the Datadog Agent).'
           format: int64
           type: integer
+        heroku_host_count:
+          description: Contains the total number of Heroku dynos reported by the Datadog
+            Agent.
+          format: int64
+          type: integer
         host_count:
           description: 'Contains the total number of billable infrastructure hosts
             reporting during a given hour.
@@ -10191,6 +10200,11 @@ components:
             App Services integration
 
             (and were NOT running the Datadog Agent).'
+          format: int64
+          type: integer
+        opentelemetry_host_count:
+          description: Contains the total number of hosts reported by Datadog exporter
+            for the OpenTelemetry Collector.
           format: int64
           type: integer
       type: object
@@ -10713,6 +10727,11 @@ components:
             the current date for all organizations.
           format: int64
           type: integer
+        heroku_host_top99p_sum:
+          description: Shows the 99th percentile of all Heroku dynos over all hours
+            in the current date for all organizations.
+          format: int64
+          type: integer
         incident_management_monthly_active_users_hwm:
           description: Shows the high-water mark of incident management monthly active
             users over all hours in the current date for all organizations.
@@ -10766,6 +10785,12 @@ components:
         npm_host_top99p:
           description: Shows the 99th percentile of all distinct Networks hosts over
             all hours in the current date for all organizations.
+          format: int64
+          type: integer
+        opentelemetry_host_top99p_sum:
+          description: Shows the 99th percentile of all hosts reported by the Datadog
+            exporter for the OpenTelemetry Collector over all hours in the current
+            date for all organizations.
           format: int64
           type: integer
         orgs:
@@ -10882,6 +10907,11 @@ components:
             the current date for the given org.
           format: int64
           type: integer
+        heroku_host_top99p:
+          description: Shows the 99th percentile of all Heroku dynos over all hours
+            in the current date for the given org.
+          format: int64
+          type: integer
         id:
           description: The organization id.
           type: string
@@ -10941,6 +10971,12 @@ components:
         npm_host_top99p:
           description: Shows the 99th percentile of all distinct Networks hosts over
             all hours in the current date for the given org.
+          format: int64
+          type: integer
+        opentelemetry_host_top99p:
+          description: Shows the 99th percentile of all hosts reported by the Datadog
+            exporter for the OpenTelemetry Collector over all hours in the current
+            date for the given org.
           format: int64
           type: integer
         profiling_host_top99p:
@@ -11065,6 +11101,11 @@ components:
             the current months for all organizations.
           format: int64
           type: integer
+        heroku_host_top99p_sum:
+          description: Shows the 99th percentile of all Heroku dynos over all hours
+            in the current months for all organizations.
+          format: int64
+          type: integer
         incident_management_monthly_active_users_hwm_sum:
           description: Shows sum of the the high-water marks of incident management
             monthly active users in the current months for all organizations.
@@ -11135,6 +11176,12 @@ components:
         npm_host_top99p_sum:
           description: Shows the 99th percentile of all distinct Networks hosts over
             all hours in the current months for all organizations.
+          format: int64
+          type: integer
+        opentelemetry_host_top99p_sum:
+          description: Shows the 99th percentile of all hosts reported by the Datadog
+            exporter for the OpenTelemetry Collector over all hours in the current
+            months for all organizations.
           format: int64
           type: integer
         profiling_container_agent_count_avg:
@@ -12734,7 +12781,7 @@ paths:
                 $ref: '#/components/schemas/APIErrorResponse'
           description: Payload too large
       security:
-      - apiKeyAuthQuery: []
+      - apiKeyAuth: []
       summary: Submit a Service Check
       tags:
       - Service Checks
@@ -13883,7 +13930,7 @@ paths:
                 $ref: '#/components/schemas/APIErrorResponse'
           description: Bad Request
       security:
-      - apiKeyAuthQuery: []
+      - apiKeyAuth: []
       summary: Post an event
       tags:
       - Events
@@ -18253,7 +18300,7 @@ paths:
                 $ref: '#/components/schemas/APIErrorResponse'
           description: Payload too large
       security:
-      - apiKeyAuthQuery: []
+      - apiKeyAuth: []
       summary: Submit metrics
       tags:
       - Metrics
@@ -21777,7 +21824,7 @@ paths:
               schema:
                 type: object
           description: Response from server (always 200 empty JSON).
-        default:
+        '400':
           content:
             application/json:
               schema:
