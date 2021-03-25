@@ -6908,6 +6908,27 @@ paths:
         required: false
         schema:
           type: boolean
+      - description: 'Filter metrics that have been submitted with the given tags.
+          Supports boolean and wildcard expressions.
+
+          Cannot be combined with other filters.'
+        example: env IN (staging,test) AND service:web
+        in: query
+        name: filter[tags]
+        required: false
+        schema:
+          type: string
+      - description: 'The number of seconds of look back (from now) to apply to a
+          filter[tag] query.
+
+          Defaults value is 3600 (1 hour), maximum value is 172,800 (2 days).'
+        example: 3600
+        in: query
+        name: window[seconds]
+        required: false
+        schema:
+          format: int64
+          type: integer
       responses:
         '200':
           content:
@@ -7870,11 +7891,25 @@ paths:
       tags:
       - Security Monitoring
       x-codegen-request-body-name: body
+      x-given:
+        security_rule:
+          parameters:
+          - name: body
+            value: "{\n  \"name\": \"{{ unique }}\",\n  \"queries\": [{\n    \"query\"\
+              : \"@test:true\",\n    \"aggregation\": \"count\",\n    \"groupByFields\"\
+              : [],\n    \"distinctFields\": [],\n    \"metric\": \"\"\n  }],\n  \"\
+              filters\": [],\n  \"cases\": [{\n    \"name\": \"\",\n    \"status\"\
+              : \"info\",\n    \"condition\": \"a > 0\",\n    \"notifications\": []\n\
+              \  }],\n  \"options\": {\n    \"evaluationWindow\": 900,\n    \"keepAlive\"\
+              : 3600,\n    \"maxSignalDuration\": 86400\n  },\n  \"hasExtendedTitle\"\
+              : false,\n  \"message\": \"Test rule\",\n  \"tags\": [],\n  \"isDefault\"\
+              : false,\n  \"isEnabled\": true,\n  \"type\": \"log_detection\"\n}"
+          step: there is a valid "security_rule" in the system
       x-undo:
         operationId: DeleteSecurityMonitoringRule
         parameters:
         - name: rule_id
-          source: data.id
+          source: id
         type: unsafe
   /api/v2/security_monitoring/rules/{rule_id}:
     delete:
